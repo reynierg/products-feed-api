@@ -77,10 +77,19 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+DEFAULT_DB_USER_NAME = 'user'
+DEFAULT_DB_PASSWORD_NAME = 'password'
+DEFAULT_DB_HOST = 'localhost'
+DEFAULT_DB_PORT = 5432
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': config('SQL_ENGINE', default='django.db.backends.sqlite3'),
+        'NAME': config('SQL_DATABASE', default=BASE_DIR / 'db.sqlite3'),
+        'USER': config('SQL_USER', default=DEFAULT_DB_USER_NAME),
+        'PASSWORD': config('SQL_PASSWORD', default=DEFAULT_DB_PASSWORD_NAME),
+        'HOST': config('SQL_HOST', default=DEFAULT_DB_HOST),
+        'PORT': config('SQL_PORT', cast=int, default=DEFAULT_DB_PORT),
     }
 }
 
