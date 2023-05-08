@@ -10,3 +10,17 @@ services:
       - 8009:8000
     env_file:
       - ./app/.env.dev
+    depends_on:
+      - products-db
+
+  products-db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=products
+      - POSTGRES_PASSWORD=products
+      - POSTGRES_DB=products_dev
+
+volumes:
+  postgres_data:
