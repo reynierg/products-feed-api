@@ -8,9 +8,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 @lru_cache
 def get_countries_choices():
-    return [
-        (country.alpha_2, country.alpha_2) for country in pycountry.countries
-    ]
+    return [(country.alpha_2, country.alpha_2) for country in pycountry.countries]
 
 
 class Supplier(models.Model):
@@ -27,17 +25,11 @@ class Session(models.Model):
     session_id = models.IntegerField(unique=True)
 
     supplier = models.ForeignKey(
-        Supplier,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='sessions'
+        Supplier, null=True, on_delete=models.SET_NULL, related_name="sessions"
     )
 
     user = models.ForeignKey(
-        get_user_model(),
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='sessions'
+        get_user_model(), null=True, on_delete=models.SET_NULL, related_name="sessions"
     )
 
     start_time = models.DateTimeField()
@@ -54,35 +46,32 @@ class Category(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['categ_id', 'category_id'], name='unique_category')
+            models.UniqueConstraint(
+                fields=["categ_id", "category_id"], name="unique_category"
+            )
         ]
 
 
 class MeatInfo(models.Model):
     country_of_disassembly = models.CharField(
-        max_length=2,
-        null=True,
-        default=None,
-        choices=get_countries_choices()
+        max_length=2, null=True, default=None, choices=get_countries_choices()
     )
 
     country_of_rearing = models.CharField(
-        max_length=2,
-        null=True,
-        default=None,
-        choices=get_countries_choices()
+        max_length=2, null=True, default=None, choices=get_countries_choices()
     )
 
     country_of_slaughter = models.CharField(
-        max_length=2,
-        null=True,
-        default=None,
-        choices=get_countries_choices()
+        max_length=2, null=True, default=None, choices=get_countries_choices()
     )
 
-    cutting_plant_registration = models.CharField(max_length=150, null=True, default=None)
+    cutting_plant_registration = models.CharField(
+        max_length=150, null=True, default=None
+    )
 
-    slaughterhouse_registration = models.CharField(max_length=150, null=True, default=None)
+    slaughterhouse_registration = models.CharField(
+        max_length=150, null=True, default=None
+    )
 
     lot_number = models.CharField(max_length=50, null=True, default=None)
 
@@ -122,25 +111,19 @@ class Product(MPTTModel):
 
     # hierarchical relationship:
     parent = TreeForeignKey(
-        'self',
+        "self",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='children'
+        related_name="children",
     )
 
     category = models.ForeignKey(
-        Category,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='products'
+        Category, null=True, on_delete=models.SET_NULL, related_name="products"
     )
 
     session = models.ForeignKey(
-        Session,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='products'
+        Session, null=True, on_delete=models.SET_NULL, related_name="products"
     )
 
     code = models.CharField(max_length=40)
@@ -153,10 +136,7 @@ class Product(MPTTModel):
     # But when it is, it will be in:
     # item -> type
     code_type = models.CharField(
-        max_length=len(WHITELISTED_PLU),
-        choices=TYPE_CHOICES,
-        null=True,
-        default=None
+        max_length=len(WHITELISTED_PLU), choices=TYPE_CHOICES, null=True, default=None
     )
 
     # It always appears in the request payload, but it could be "", null or a valid str.
@@ -225,13 +205,12 @@ class Product(MPTTModel):
     # But if it appears as "trade_item_descriptor", THEN it should be stored as
     # "trade_item_unit_descriptor" in the database.
     trade_item_unit_descriptor = models.CharField(
-        max_length=len(BASE_UNIT_OR_EACH),
-        choices=TRADE_ITEM_UNIT_DESCRIPTOR_CHOICES
+        max_length=len(BASE_UNIT_OR_EACH), choices=TRADE_ITEM_UNIT_DESCRIPTOR_CHOICES
     )
 
     TRADE_ITEM_UNIT_DESCRIPTOR_NAME_CHOICES = [
         (KARTON, "Karton"),
-        (BASISEINHEIT, "Basiseinheit")
+        (BASISEINHEIT, "Basiseinheit"),
     ]
     # It could not exist in the request's payload for an "item".
     # In that case, null/None should be inserted
@@ -239,7 +218,7 @@ class Product(MPTTModel):
         null=True,
         default=None,
         max_length=len(BASISEINHEIT),
-        choices=TRADE_ITEM_UNIT_DESCRIPTOR_NAME_CHOICES
+        choices=TRADE_ITEM_UNIT_DESCRIPTOR_NAME_CHOICES,
     )
 
     # It could not be present in the request's payload for an "item".
@@ -269,8 +248,7 @@ class Product(MPTTModel):
     # - status
     # It should be stored as "validation_status"
     validation_status = models.CharField(
-        max_length=len(UNVALIDATED),
-        choices=VALIDATED_STATUS_CHOICES
+        max_length=len(UNVALIDATED), choices=VALIDATED_STATUS_CHOICES
     )
 
     # If present, it will appear under the key "item" in:
@@ -311,10 +289,7 @@ class Product(MPTTModel):
     #     ...
     # },
     vat_rate = models.CharField(
-        max_length=len(STANDARD),
-        choices=VAT_RATE_CHOICES,
-        null=True,
-        default=None
+        max_length=len(STANDARD), choices=VAT_RATE_CHOICES, null=True, default=None
     )
 
     regulated_name = models.CharField(max_length=100, null=True, default=None)
@@ -322,9 +297,7 @@ class Product(MPTTModel):
 
 class StocksByBestBeforeDate(models.Model):
     product = models.ForeignKey(
-        Product,
-        on_delete=models.CASCADE,
-        related_name='stocks_by_expiry_date'
+        Product, on_delete=models.CASCADE, related_name="stocks_by_expiry_date"
     )
     bbd = models.DateTimeField(null=True, default=None)
     amount = models.IntegerField()
